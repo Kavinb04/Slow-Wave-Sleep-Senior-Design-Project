@@ -32,10 +32,11 @@ Why use STM32WB5MMG for Microcontroller?
 
 ### Visuals for Proposal
 
-![ECE_445_Proposal_circuit](images/ECE_445_Proposal_circuit.png) <br>
-*KiCAD schematic containg ADC and Microcontroller* <br> <br>
+![ECE_445_visual_aid](images/ECE_445_visual_aid.PNG) <br>
+*Reading EEG Signals to Playing Pink Noise Visual Aid* <br> <br>
 
 ![ECE_445_initial_block_diagram](images/ECE_445_initial_block_diagram.PNG) <br>
 *Initial Block Diagram showing each subsystem* <br> <br>
 
-
+![ECE_445_Proposal_circuit](images/ECE_445_Proposal_circuit.png) <br>
+*KiCAD schematic containg ADC and Microcontroller* <br> <br>
