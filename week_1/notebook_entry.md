@@ -17,3 +17,6 @@ Why use STM32WB5MMG for Microcontroller?
 
 ![ECE_445_Proposal_circuit](images/ECE_445_Proposal_circuit.png) <br>
 *KiCAD schematic containg ADC and Microcontroller*
+
+![ECE_445_initial_block_diagram](images/ECE_445_initial_block_diagram.png) <br>
+*Initial Block Diagram showing each subsystem*
