@@ -15,4 +15,5 @@ Why use STM32WB5MMG for Microcontroller?
 
 - Bluetooth Capability 
 
-![KiCAD Schematic for Proposal](/images/ECE_445_Proposal_circuit "Schematic for Proposal")
+![ECE_445_Proposal_circuit](images/ECE_445_Proposal_circuit.png) <br>
+*KiCAD schematic containg ADC and Microcontroller*
