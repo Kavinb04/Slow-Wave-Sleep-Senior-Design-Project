@@ -16,11 +16,23 @@ Our main objective this week was to make enough progress in our PCB design to go
 *Attempt at designing extra protection for sending EEG signals to ADS1298 chip* <br> <br>
 
 ![new_protection_circuit](images/new_protection_circuit.png) <br>
-*Protection circuit for sending EEG signals to ADS1299 chip* <br> <br>
+*Protection circuit in the datasheet for sending EEG signals to ADS1299 chip* <br> <br>
 
 ### Built the Power Subsystem
+#### What was considered when designing the Power Subsystem?
+- Directly affects whether or not we meet our goal of providing at least 10 hours of battery life
 - Used the Cyton Biosensing board as inspiration on how to power our PCB board components
-- Had to take into consideration that both the STM microcontroller and ADS1299 chip had varying power needs
+- Had to take into consideration that both the STM microcontroller and ADS1299 chip had varying voltage needs
+- ADS1299 requires a $\pm 2.5V$ supply
+- STM32WB5MMG requires a 3.3 V supply
+- Needed to use multiple Voltage regulators to keep each component's voltage needs met
+
+#### Finalized Components for Power Subsystem
+- Battery in the 3-6V range
+- 3.3V regulator
+- 2.5V regulator
+- Inverter
+- -2.5V regulator
 
 ## Supporting Docs and Figures
 
