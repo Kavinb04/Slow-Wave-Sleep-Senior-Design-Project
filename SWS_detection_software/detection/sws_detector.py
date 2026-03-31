@@ -5,9 +5,9 @@ import yasa
 SW_FREQ_BAND = (0.5, 2.0)
 SW_DUR_NEG   = (0.3, 1.5)
 SW_DUR_POS   = (0.1, 1.0)
-SW_AMP_NEG   = (100, 200)   
-SW_AMP_POS   = (30, 150)    
-SW_AMP_P2P   = (175, 500)
+SW_AMP_NEG   = (75, 200)     # back to looser
+SW_AMP_POS   = (20, 150)     
+SW_AMP_P2P   = (140, 500)
 
 class SWSDetector:
     def __init__(self, sample_rate: int = 250):
@@ -30,8 +30,8 @@ class SWSDetector:
                 amp_ptp=SW_AMP_P2P,
             )
 
-            print(f"  sw type: {type(sw)}")
-            print(f"  sw value: {sw}")
+            # print(f"  sw type: {type(sw)}")
+            # print(f"  sw value: {sw}")
             # sw is None if nothing detected
             if sw is None:
                 return {'slow_waves': None, 'is_sws': False, 'sw_count': 0}

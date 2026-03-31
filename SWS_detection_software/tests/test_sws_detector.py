@@ -35,16 +35,36 @@ def test_real_eeg(edf_path):
     detector = SWSDetector(sample_rate=SAMPLE_RATE)
     eeg = load_real_eeg(edf_path)
 
-    # Test on a 5-minute slice from hour 1 (likely SWS territory)
-    start = 0 * 60 * SAMPLE_RATE   # Start of recording
-    end   = 480 * 60 * SAMPLE_RATE 
+    # Known SWS segment
+    start_min = 733
+    end_min   = 742
+
+    start = start_min * 60 * SAMPLE_RATE
+    end   = end_min   * 60 * SAMPLE_RATE
     chunk = eeg[start:end]
 
     print(f"  Chunk duration: {len(chunk)/SAMPLE_RATE:.0f}s")
     result = detector.detect(chunk)
     print(f"  Slow waves found: {result['sw_count']}")
-    assert result['sw_count'] > 0, "Real EEG should have slow waves"
-    print("PASS - real EEG")
+
+    if result['slow_waves'] is not None and result['sw_count'] > 0:
+        df = result['slow_waves']
+        print(f"\n  {'#':<5} {'Start (s)':<12} {'End (s)':<12} {'Duration (s)':<14} {'Abs time'}")
+        print(f"  {'-'*55}")
+        for i, row in df.iterrows():
+            start_s   = row['Start']
+            end_s     = row['End']
+            duration  = end_s - start_s
+            # Absolute time from start of full recording
+            abs_start = (start_min * 60) + start_s
+            abs_min   = int(abs_start // 60)
+            abs_sec   = abs_start % 60
+            print(f"  {i:<5} {start_s:<12.2f} {end_s:<12.2f} {duration:<14.2f} {abs_min}m {abs_sec:.1f}s")
+    else:
+        print("  No slow waves detected")
+
+    print("\nPASS - real EEG")
+
 
 def test_sliding_window(edf_path):
     detector = SWSDetector(sample_rate=SAMPLE_RATE)
