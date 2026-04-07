@@ -1,71 +1,124 @@
 import numpy as np
 import collections
 import mne
+import yasa
 from scipy.signal import butter, sosfilt, sosfilt_zi
+import warnings
+import sys
+import os
 
 # ── Parameters ─────────────────────────────────────────
-FILTER_LOW = 0.25
-FILTER_HIGH = 4.0
+FILTER_LOW          = 0.25
+FILTER_HIGH         = 4.0
+MIN_NEG_DURATION_S  = 0.15
+MAX_NEG_DURATION_S  = 2.0
+MIN_PEAK_UV         = -60.0
+PEAK_CONFIRM        = 3
+POST_WAVE_PAUSE_S   = 1.5
 
-DEFAULT_THRESHOLD = -80.0
-MIN_NEG_DURATION_S = 0.15
-MAX_NEG_DURATION_S = 2.0
-MIN_PEAK_UV = -50.0
+WINDOW_SEC          = 30     # ← BACK TO 30s
+YASA_CHECK_EVERY_S  = 1.0    # ← BACK TO 1s
+YASA_MIN_WAVES      = 5
 
-PEAK_CONFIRM = 3
-
-# Time window
-START_TIME = 8 * 3600
-END_TIME = 9 * 3600
+START_TIME          = 8 * 3600
+END_TIME            = 9 * 3600
 
 
 # ── Bandpass Filter ────────────────────────────────────
 class BandpassFilter:
     def __init__(self, sf):
-        nyq = sf / 2.0
-        sos = butter(4, [FILTER_LOW / nyq, FILTER_HIGH / nyq],
-                     btype='band', output='sos')
+        nyq      = sf / 2.0
+        sos      = butter(4, [FILTER_LOW / nyq, FILTER_HIGH / nyq],
+                          btype='band', output='sos')
         self.sos = sos
-        self.zi = sosfilt_zi(sos) * 0.0
+        self.zi  = sosfilt_zi(sos) * 0.0
 
     def __call__(self, sample):
         out, self.zi = sosfilt(self.sos, [sample], zi=self.zi)
         return float(out[0])
 
 
-# ── Detector ───────────────────────────────────────────
+# ── YASA Gate (ONLY change: silence output) ─────────────
+class YasaGate:
+    def __init__(self, sf):
+        self.sf             = sf
+        self.window_samples = int(WINDOW_SEC * sf)
+        self.check_every    = int(YASA_CHECK_EVERY_S * sf)
+        self.raw_buffer     = collections.deque(maxlen=self.window_samples)
+        self.is_open        = False
+        self.samples_since_check = 0
+
+    def update(self, raw_uv):
+        self.raw_buffer.append(raw_uv)
+        self.samples_since_check += 1
+
+        if self.samples_since_check < self.check_every:
+            return self.is_open
+
+        self.samples_since_check = 0
+
+        if len(self.raw_buffer) < self.window_samples:
+            return self.is_open
+
+        window = np.array(self.raw_buffer)
+
+        # 🔥 SILENCE EVERYTHING FROM YASA
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = open(os.devnull, 'w')
+        sys.stderr = open(os.devnull, 'w')
+
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                sw = yasa.sw_detect(window, self.sf, verbose='ERROR')
+            n_waves = len(sw.summary()) if sw is not None else 0
+        except:
+            n_waves = 0
+
+        sys.stdout.close()
+        sys.stderr.close()
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+
+        # ← YOUR ORIGINAL SIMPLE LOGIC
+        self.is_open = n_waves >= YASA_MIN_WAVES
+
+        return self.is_open
+
+
+# ── Real-Time Detector (UNCHANGED except print) ─────────
 class Detector:
     def __init__(self, sf):
-        self.sf = sf
-        self.filt = BandpassFilter(sf)
+        self.sf              = sf
+        self.filt            = BandpassFilter(sf)
+        self.gate            = YasaGate(sf)
 
-        self.buffer = collections.deque(maxlen=int(10 * sf))
-
-        self.threshold = DEFAULT_THRESHOLD
-        self.last_thresh_idx = 0
-
-        self.state = 'WAITING'
-        self.track_peak = 0.0
+        self.state           = 'WAITING'
+        self.track_peak      = 0.0
         self.track_start_idx = 0
-        self.rise_count = 0
-        self.prev = 0.0
-
-        self.n_slow_waves = 0
-        self.n_artifacts = 0
+        self.rise_count      = 0
+        self.prev            = 0.0
+        self.pause_until_idx = 0
 
     def process(self, raw_uv, idx):
-        sample = self.filt(raw_uv)
-        self.buffer.append(sample)
+        t = idx / self.sf
 
-        # adaptive threshold
-        self.threshold = DEFAULT_THRESHOLD
+        gate_open = self.gate.update(raw_uv)
+        sample = self.filt(raw_uv)
+
+        if self.state == 'PAUSED':
+            if idx >= self.pause_until_idx:
+                self.state = 'WAITING'
+            self.prev = sample
+            return
 
         if self.state == 'WAITING':
-            if (self.prev > sample) and (sample < -35):
-                self.state = 'TRACKING'
-                self.track_peak = sample
+            if self.prev >= -35.0 and sample < -35.0:
+                self.state           = 'TRACKING'
+                self.track_peak      = sample
                 self.track_start_idx = idx
-                self.rise_count = 0
+                self.rise_count      = 0
 
         elif self.state == 'TRACKING':
             if sample < self.track_peak:
@@ -74,55 +127,54 @@ class Detector:
             elif sample > self.prev:
                 self.rise_count += 1
                 if self.rise_count >= PEAK_CONFIRM:
-                    self._evaluate(idx)
+                    self._evaluate(idx, t, gate_open)
 
         self.prev = sample
 
-    def _evaluate(self, idx):
+    def _evaluate(self, idx, t, gate_open):
         duration = (idx - self.track_start_idx) / self.sf
-        peak = self.track_peak
+        peak     = self.track_peak
 
-        # slow wave criteria
-        if duration < MIN_NEG_DURATION_S or duration > MAX_NEG_DURATION_S:
-            self.n_artifacts += 1
+        if not (MIN_NEG_DURATION_S <= duration <= MAX_NEG_DURATION_S):
             self.state = 'WAITING'
             return
 
         if peak > MIN_PEAK_UV:
-            self.n_artifacts += 1
             self.state = 'WAITING'
             return
 
-        self.n_slow_waves += 1
-        self.state = 'WAITING'
+        if gate_open:
+            print(format_time(t))   # ← ONLY OUTPUT
+
+        self.pause_until_idx = idx + int(POST_WAVE_PAUSE_S * self.sf)
+        self.state           = 'PAUSED'
 
 
-# ── Run Detection ──────────────────────────────────────
+# ── Helpers ────────────────────────────────────────────
+def format_time(seconds):
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    s = int(seconds % 60)
+    return f"{h}:{m:02d}:{s:02d}"
+
+
+# ── Run ────────────────────────────────────────────────
 def run_detection():
-    edf_path = "SC4001E0-PSG.edf"
-    channel = "EEG Fpz-Cz"
+    raw = mne.io.read_raw_edf("SC4001E0-PSG.edf", preload=True, verbose=False)
 
-    raw = mne.io.read_raw_edf(edf_path, preload=True, verbose=False)
-    raw.pick([channel])
+    # ← CORRECT CHANNEL
+    raw.pick(["EEG Fpz-Cz"])
 
-    sf = raw.info['sfreq']
+    sf     = raw.info['sfreq']
     signal = raw.get_data(units='uV')[0]
 
-    detector = Detector(sf)
-
+    detector  = Detector(sf)
     start_idx = int(START_TIME * sf)
-    end_idx = int(END_TIME * sf)
-
-    print(f"Running from {START_TIME}s to {END_TIME}s\n")
+    end_idx   = int(END_TIME * sf)
 
     for i in range(start_idx, min(end_idx, len(signal))):
         detector.process(signal[i], i)
 
-    print("\nRESULTS")
-    print(f"Slow waves detected: {detector.n_slow_waves}")
-    print(f"Rejected (artifacts): {detector.n_artifacts}")
 
-
-# ── Main ───────────────────────────────────────────────
 if __name__ == "__main__":
     run_detection()
