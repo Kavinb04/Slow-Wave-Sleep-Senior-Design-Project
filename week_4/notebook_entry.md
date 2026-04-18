@@ -2,5 +2,10 @@
 
 Our main objective was fixing our Slow Wave Sleep PCB in time for the 2nd Round of ordering. Although we could not finish solving all of the DRC and layout issues, we still sent an order to test partial functionality.
 
-##PCB Errors Summary
+## PCB Errors Summary
+
+* The front and back grounding layers (B.Cu and F.Cu) were not connected in certain areas
+* Various copper islands arose from this
+* Many pad spacing errors on the ADS1299 chip
+![Alt text](round_2_pcb_layout.png)
 
