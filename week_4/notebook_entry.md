@@ -8,6 +8,9 @@ Our main objective was fixing our Slow Wave Sleep PCB in time for the 2nd Round 
 * Used Connector pins to expose the SWDIO, SWCLK, Vcc, GND, UART_Tx, and UART_Rx for programming and data 
 * Changed protection circuit for the STM to be more similar to the datasheet
 
+![Alt text](week_4_ads_schematic.PNG)
+![Alt text](week_4_stm_schematic.PNG)
+
 
 
 ## DRC Errors Summary
@@ -15,5 +18,6 @@ Our main objective was fixing our Slow Wave Sleep PCB in time for the 2nd Round 
 * The front and back grounding layers (B.Cu and F.Cu) were not connected in certain areas
 * Various copper islands arose from this
 * Many pad spacing errors on the ADS1299 chip
+
 ![Alt text](round_2_pcb_layout.png)
 
