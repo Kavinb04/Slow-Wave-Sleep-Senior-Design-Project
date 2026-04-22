@@ -149,8 +149,8 @@ int main(void)
   volatile uint8_t cfg3_val = cfg3_read_rx[2];
   HAL_Delay(1);
 
-  // Write CH1SET: gain=6, normal input (0x00)
-  uint8_t ch1set_write[3] = {0x45, 0x00, 0x00};
+  // Write CH1SET: gain=12, 0x50
+  uint8_t ch1set_write[3] = {0x45, 0x00, 0x50};
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
   HAL_SPI_Transmit(&hspi1, ch1set_write, 3, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
