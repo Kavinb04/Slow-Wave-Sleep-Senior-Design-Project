@@ -107,7 +107,7 @@ int main(void)
   MX_USART1_UART_Init(); // MAKE SURE TO REMOVE FOR BLUETOOTH
   /* USER CODE BEGIN 2 */
 
-  // RESET
+  // ===== RESET =====
   HAL_GPIO_WritePin(ADS_RESET_GPIO_Port, ADS_RESET_Pin, GPIO_PIN_RESET);
   HAL_Delay(10);
   HAL_GPIO_WritePin(ADS_RESET_GPIO_Port, ADS_RESET_Pin, GPIO_PIN_SET);
@@ -117,14 +117,14 @@ int main(void)
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
   HAL_Delay(1);
 
-  // SDATAC
+  // ===== SDATAC (device powers up in RDATAC, must exit before writing registers) =====
   uint8_t cmd_sdatac = 0x11;
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
   HAL_SPI_Transmit(&hspi1, &cmd_sdatac, 1, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
   HAL_Delay(1);
 
-  // Read device ID (expect 0x3E)
+  // ===== Read device ID (expect 0x3E for ADS1299) =====
   uint8_t rreg_tx[3] = {0x20, 0x00, 0x00};
   uint8_t rreg_rx[3] = {0};
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
@@ -133,42 +133,87 @@ int main(void)
   volatile uint8_t device_id = rreg_rx[2];
   HAL_Delay(1);
 
-  // Write CONFIG3: enable internal reference buffer (0xE0)
-  uint8_t cfg3_write[3] = {0x43, 0x00, 0xE0};
+  // ===== CONFIG1: 0x96 = 1001 0110
+  // Bit7=1(reserved), DAISY_EN=0, CLK_EN=0, bits4:3=10(reserved), DR=110 => 250 SPS
+  // 250 SPS is ideal for EEG (1-50 Hz bandwidth) =====
+  uint8_t cfg1_write[3] = {0x41, 0x00, 0x96};
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi1, cfg1_write, 3, HAL_MAX_DELAY);
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
+  HAL_Delay(1);
+
+  // ===== CONFIG2: 0xC0 = internal test signals OFF, no calibration signal =====
+  uint8_t cfg2_write[3] = {0x42, 0x00, 0xC0};
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi1, cfg2_write, 3, HAL_MAX_DELAY);
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
+  HAL_Delay(1);
+
+  // ===== CONFIG3: 0xEC = 1110 1100
+  // PD_REFBUF=1 (enable internal ref), reserved=11,
+  // BIAS_MEAS=0, BIASREF_INT=1 (internal midsupply ref for bias),
+  // PD_BIAS=1 (bias amp ON), BIAS_LOFF_SENS=0, BIAS_STAT=0 =====
+  uint8_t cfg3_write[3] = {0x43, 0x00, 0xEC};
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
   HAL_SPI_Transmit(&hspi1, cfg3_write, 3, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
-  HAL_Delay(150); // Must wait >150ms after enabling internal reference
+  HAL_Delay(150); // MUST wait >150ms for internal reference to settle
 
-  // Read back CONFIG3
-  uint8_t cfg3_read_tx[3] = {0x23, 0x00, 0x00};
-  uint8_t cfg3_read_rx[3] = {0};
-  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
-  HAL_SPI_TransmitReceive(&hspi1, cfg3_read_tx, cfg3_read_rx, 3, HAL_MAX_DELAY);
-  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
-  volatile uint8_t cfg3_val = cfg3_read_rx[2];
-  HAL_Delay(1);
-
-  // Write CH1SET: gain=12, 0x50
-  uint8_t ch1set_write[3] = {0x45, 0x00, 0x50};
+  // ===== CH1SET: 0x60 = gain=24 (110), SRB2=0, MUX=000 (normal electrode input)
+  // Gain 24 gives best noise: ~0.14 uVPP at 250 SPS per datasheet Table 4 =====
+  uint8_t ch1set_write[3] = {0x45, 0x00, 0x20};
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
   HAL_SPI_Transmit(&hspi1, ch1set_write, 3, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
   HAL_Delay(1);
 
-  // Send RDATAC BEFORE raising START
+  // ===== Power down unused channels 2-8 with input shorted (MUX=001) =====
+  // PDn=1, GAIN=110, SRB2=0, MUX=001 => 0xE1
+  // This reduces noise coupling from floating inputs
+  uint8_t ch_powerdown[3] = {0x46, 0x06, 0xE1}; // start at CH2SET (0x06), write 7 registers
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi1, ch_powerdown, 1, HAL_MAX_DELAY);  // send WREG command byte
+  uint8_t ch_powerdown_cmd = 0x06;  // 000n nnnn: write 7 registers (n=6)
+  HAL_SPI_Transmit(&hspi1, &ch_powerdown_cmd, 1, HAL_MAX_DELAY);
+  uint8_t ch_val = 0xE1;
+  for (int i = 0; i < 7; i++) {
+      HAL_SPI_Transmit(&hspi1, &ch_val, 1, HAL_MAX_DELAY);
+  }
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
+  HAL_Delay(1);
+
+  // ===== BIAS_SENSP / BIAS_SENSN: route CH1 into bias drive =====
+  // This creates common-mode feedback to stabilize electrode voltage within ADC range
+  // Critical for real EEG electrodes on body
+  uint8_t bias_sensp[3] = {0x4D, 0x00, 0x01}; // BIASP1 = 1 (CH1 positive into bias)
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi1, bias_sensp, 3, HAL_MAX_DELAY);
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
+  HAL_Delay(1);
+
+  uint8_t bias_sensn[3] = {0x4E, 0x00, 0x01}; // BIASN1 = 1 (CH1 negative into bias)
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
+  HAL_SPI_Transmit(&hspi1, bias_sensn, 3, HAL_MAX_DELAY);
+  HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
+  HAL_Delay(1);
+
+  // ===== RDATAC =====
   uint8_t cmd_rdatac = 0x10;
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_RESET);
   HAL_SPI_Transmit(&hspi1, &cmd_rdatac, 1, HAL_MAX_DELAY);
   HAL_GPIO_WritePin(ADS_CS_GPIO_Port, ADS_CS_Pin, GPIO_PIN_SET);
   HAL_Delay(1);
 
-  // Now raise START to begin conversions
+  // ===== Raise START to begin conversions =====
   HAL_GPIO_WritePin(ADS_START_GPIO_Port, ADS_START_Pin, GPIO_PIN_SET);
-  HAL_Delay(1);
+  HAL_Delay(10); // wait for filter to settle (tSETTLE = 32777 tCLK @ 250SPS ~ 16ms)
 
   uint8_t frame[27];
   uint8_t dummy_tx[27] = {0};
+  int32_t dc_estimate = 0;
+  int32_t ch1_filtered = 0;
+  uint16_t warmup_samples = 0;
+  uint8_t dc_initialized = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -192,8 +237,21 @@ int main(void)
 	     if (ch1 & 0x00800000)
 	         ch1 |= 0xFF000000;
 
+	     // Simple IIR DC removal (high pass)
+	     if(!dc_initialized){
+	    	 dc_estimate = ch1 << 8;
+	    	 dc_initialized = 1;
+	     }
+	     dc_estimate = dc_estimate - (dc_estimate >> 8) + (ch1 >> 8);
+	     ch1_filtered = ch1 - dc_estimate;
+
+	     if (warmup_samples < 2000){
+	    	 warmup_samples++;
+	    	 continue;
+	     }
+
 	     char msg[32];
-	     sprintf(msg, "%ld\r\n", (long)ch1);
+	     sprintf(msg, "%ld\r\n", (long)ch1_filtered);
 	     HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
 
 
