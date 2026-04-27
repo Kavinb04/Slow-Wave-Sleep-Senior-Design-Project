@@ -245,7 +245,7 @@ int main(void)
 	     dc_estimate = dc_estimate - (dc_estimate >> 8) + (ch1 >> 8);
 	     ch1_filtered = ch1 - dc_estimate;
 
-	     if (warmup_samples < 2000){
+	     if (warmup_samples < 500){
 	    	 warmup_samples++;
 	    	 continue;
 	     }
