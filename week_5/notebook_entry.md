@@ -4,3 +4,12 @@ This week was mainly focused on our Breadboard Demo. Acquiring the dev boards fo
 
 ## Breadboard Demo Objective
 Our main objective was to show the amplification and digitization of signals in the 10 - 100 $\mu v$ range. Our end goal was to be able to plot these signals in real-time on the computer. 
+
+Signal Generator and Voltage Divider:
+- The 
+
+STM Microcontroller Dev Board:
+- 
+
+Python Plotting:
+- 
