@@ -5,8 +5,10 @@ This week was mainly focused on our Breadboard Demo. Acquiring the dev boards fo
 ## Breadboard Demo Objective
 Our main objective was to show the amplification and digitization of signals in the 10 - 100 $\mu v$ range. Our end goal was to be able to plot these signals in real-time on the computer. 
 
-Signal Generator and Voltage Divider:
-- The 
+Amplification of Sine Wave:
+- The Signal Generator can generate a sine wave with a minimum peak to peak Voltage of 1 mV (Amplitude of 500 $\mu V$)
+- Used Voltage divider to bring voltage down to 50 $\mu V$ (Acceptable EEG output range is 0 to 100 $\mu V$)
+- 
 
 STM Microcontroller Dev Board:
 - 
