@@ -16,3 +16,7 @@ STM Microcontroller Dev Board:
 Python Plotting:
 - Using a UART to USB connector
 - Python script reads values from COM Port
+
+Breadboard Circuit:
+<img width="4284" height="5712" alt="IMG_0324" src="https://github.com/user-attachments/assets/931278a7-1e18-41d9-8409-861c02b7466d" />
+
