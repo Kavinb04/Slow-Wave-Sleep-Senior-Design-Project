@@ -11,7 +11,8 @@ Amplification of Sine Wave:
 - 
 
 STM Microcontroller Dev Board:
-- 
+- Does not have bluetooth capability so sent data through UART
 
 Python Plotting:
-- 
+- Using a UART to USB connector
+- Python script reads values from COM Port
