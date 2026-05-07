@@ -45,5 +45,15 @@ Finalized PCB
 (Insert image of stencil board here)
 How we applied stencil solder
 
+## Sine wave plotting
+- Able to get a sine wave.
+- Lots of noise (Need to adjust STM and python plotting code)
+- Used AI assistance from Claude to perfect the STM data transmission (ensuring we are sending correct values)
+
+<img width="880" height="651" alt="image" src="https://github.com/user-attachments/assets/432bbf97-15ab-49da-ac00-099c19ef590b" />
+Feeding Sine wave to custom PCB and plotting
+
+
+
 
 
