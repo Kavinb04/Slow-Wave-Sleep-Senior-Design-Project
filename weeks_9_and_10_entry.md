@@ -4,5 +4,5 @@ While waiting on our PCB, we decided to shift our focus to the slow wave detecti
 
 ## What we learned when working with YASA:
 - YASA Python library detects slow waves using ".sw_detect" function
-- .sw_detect requires at least 30 seconds 
-- 
+- .sw_detect requires at least 30 seconds of sleep data (not adjusted for live EEG data)
+- Used sliding window approach to analyze 30 seconds of sleep data that 
