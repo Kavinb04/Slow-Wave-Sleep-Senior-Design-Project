@@ -10,5 +10,9 @@
 <img width="678" height="661" alt="image" src="https://github.com/user-attachments/assets/e5a8b2f3-bd14-48f5-8018-be6f562aa830" />
 *ADS1299 Datasheet Snippet Detailing Pad Spacing Fix*
 
+<img width="495" height="485" alt="image" src="https://github.com/user-attachments/assets/6283c878-a8c1-4b42-a7e9-657356ad4989" />
+*DRC Error snippet*
+
+
 
 
