@@ -166,7 +166,7 @@
 *Plotting EEG using OpenBCI software*
 
 # Week 12 (4/13/2026 - 4/19/2026):
-- Our PCB finally arrived, but unfortunately it only arrived on the day before the progress demo. Additionally, it did not come with the stencil for soldering so we did not want to solder the board and waste our chips in case we made a mistake since they are very expensive and we only have 2 of each
+- Our PCB arrived unfortunately the day before the progress demo. So we didn't get the chance to work on it much. Additionally, it did not come with the stencil for soldering so we did not want to solder the board and waste our chips in case we made a mistake since they are very expensive and we only have 2 of each
 - We finally got our stencil and we are going to use this to solder the ADS1299 and STM32 chips. We just realized that the pad spacing is extremely small and we cannot see the pads below the STM32 chip. We hope that this won’t cause any problems down the line.
 
 <img width="660" height="487" alt="image" src="https://github.com/user-attachments/assets/a60b90d9-7c88-4678-87ea-28b61bc2c5db" />
