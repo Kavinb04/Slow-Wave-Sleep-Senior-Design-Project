@@ -134,13 +134,14 @@
 - They have agreed to sponsor the PCB. This is good news. Now we will just have to solve the grounding issues. 
 - We consulted with Xiadong again, and we were able to solve all of our issues. The main problems that we had at the end were only 2 errors. There was no proper grounding connection for the STM chip and that was resolved by moving the wire traces and adding vias. We also adjusted the pad spacing to match the documentation and were able to resolve all of our PCB issues
 - Met with Hossein and showed our progress with the PCB errors
+- And talked about what we were doing for the progress demo
 - We made the order for the PCB and set it for expedited delivery because we have the progress demo next week and we want to be able to show our final PCB. 
 - I have decided to start looking at how we can program the STM once we get the PCB.
 
 <img width="662" height="370" alt="image" src="https://github.com/user-attachments/assets/be674f3b-5166-4582-ad42-77b0d5000f91" />
 *Finalized PCB without any DRC errors*
 
-Week 11 (4/6/2026 - 4/12/2026):
+# Week 11 (4/6/2026 - 4/12/2026):
 - The PCB has gotten stuck in shipment. We have not received the order yet. This is a little worrying since our progress demo is this week. 
 - I have decided to shift the focus of our software. We haven’t had too many opportunities till now to work on it because of the PCB and hardware design issues. 
 - Essentially, the first step would be to look at the publicly available EDF dataset and try to run a real time algorithm that runs through the data 
@@ -149,13 +150,14 @@ Week 11 (4/6/2026 - 4/12/2026):
 - We have decided to use an algorithm that is reading EEG data in real time and counting the number of peaks if the wave goes below a certain threshold
 - This threshold will mean that we are in the correct amplitude of the slow wave peaks 
 - Kavin is simultaneously trying to implement YASA slow wave detector to let my algorithm know when we are in slow wave sleep 
-- Met with Hossein and talked about what we were doing for the progress demo
 - I am designing an algorithm to count the number of peaks after the EEG goes below a certain threshold and after I know that I am in slow wave sleep. Then if the number of peaks is more than 5 then we are surely in slow wave sleep. I will play the pink noise at this point of time. 
 - I figured that it is not possible to know exactly when we are in pink wave sleep as soon as it starts. So we will need to have some kind of rolling buffer
 - So in my updated algorithm, I am going to have a rolling buffer of 30 seconds which is updated every second. I am going to look to see if we are in a slow wave based on these 30 seconds. Then start counting peaks if we cross a threshold and play pink noise after 5 peaks are detected.
 - We were moderately successful in designing this algorithm and this is what we plan to show in the progress demo since we do not have our PCB yet. It still seems to be stuck in transit 
 - Originally we hoped that it would arrive before the progress demo and we could try soldering on the STM32 and the ADS1299 chips to show hardware progress, however it did not arrive. 
-Some of the code has been uploaded on the GitHub branch. We used AI to assist us with coding
+- Some of the code has been uploaded on the GitHub branch. We used AI to assist us with coding
+- We finished the algorithm and decided to demo using the Cyton board as an input to the algorithm. We showed pink noise being played at certain timestamps which roughly corresponded to the slow wave sleep on the EDF field. 
+- After the demo, we decided to start soldering the PCB 
 
 <img width="669" height="359" alt="image" src="https://github.com/user-attachments/assets/c493ee99-c397-46af-8015-5a5705aaa16d" />
 *EDF file we were working with*
@@ -165,8 +167,6 @@ Some of the code has been uploaded on the GitHub branch. We used AI to assist us
 
 # Week 12 (4/13/2026 - 4/19/2026):
 - Our PCB finally arrived, but unfortunately it only arrived on the day before the progress demo. Additionally, it did not come with the stencil for soldering so we did not want to solder the board and waste our chips in case we made a mistake since they are very expensive and we only have 2 of each
-- We finished the algorithm and decided to demo using the Cyton board as an input to the algorithm. We showed pink noise being played at certain timestamps which roughly corresponded to the slow wave sleep on the EDF field. 
-- After the demo, we decided to start soldering the PCB 
 - We finally got our stencil and we are going to use this to solder the ADS1299 and STM32 chips. We just realized that the pad spacing is extremely small and we cannot see the pads below the STM32 chip. We hope that this won’t cause any problems down the line.
 
 <img width="660" height="487" alt="image" src="https://github.com/user-attachments/assets/a60b90d9-7c88-4678-87ea-28b61bc2c5db" />
