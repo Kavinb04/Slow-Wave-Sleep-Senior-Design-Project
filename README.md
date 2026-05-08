@@ -22,3 +22,9 @@
 - We had our first meeting with our TA Hossein. It was a fruitful discussion and he thinks that this project should be fairly complicated and we should work consistently to get it done
 
 <img width="610" height="154" alt="image" src="https://github.com/user-attachments/assets/b8bbffb9-2d3b-4987-9b82-e00b2bf296fa" />
+
+- We are starting work on our Proposal
+- We have begun choosing PCB components
+-W e are leaning towards using ADS1298 chip as our ADC because it is cheaper than cADS1299 chip ($45.80 vs $73.295)
+- We are also planning on using STM32WB5MMG for Microcontroller because of its built-in 2.4 GHz radio for BLE communication
+- I have experience using and programming STM Microcontrollers and it has low power consumption for longer bettery life
