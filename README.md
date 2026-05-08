@@ -21,3 +21,4 @@
 - Our high level requirements are: play pink noise within 300 ms of detecting slow wave sleep, average comfort rating of the headset should be a ⅘, design should be able to support 10 hours of consecutive sleep, 
 - We had our first meeting with our TA Hossein. It was a fruitful discussion and he thinks that this project should be fairly complicated and we should work consistently to get it done
 
+<img width="610" height="154" alt="image" src="https://github.com/user-attachments/assets/b8bbffb9-2d3b-4987-9b82-e00b2bf296fa" />
