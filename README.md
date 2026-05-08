@@ -18,7 +18,7 @@
 - We met up to start work on the proposals and came up with our high level requirements 
 - The high level requirement were solidified after meeting with our sponsor
 - I set up meetings with Maggie and we asked her all our questions
-- Our high level requirements are: play pink noise within 300 ms of detecting slow wave sleep, average comfort rating of the headset should be a ⅘, design should be able to support 10 hours of consecutive sleep, 
+- Our high level requirements are: play pink noise within 300 ms of detecting slow wave sleep, average comfort rating of the headset should be a ⅘, design should be able to support 10 hours of consecutive sleep 
 - We had our first meeting with our TA Hossein. It was a fruitful discussion and he thinks that this project should be fairly complicated and we should work consistently to get it done
 
 <img width="610" height="154" alt="image" src="https://github.com/user-attachments/assets/b8bbffb9-2d3b-4987-9b82-e00b2bf296fa" />
@@ -28,3 +28,17 @@
 -W e are leaning towards using ADS1298 chip as our ADC because it is cheaper than cADS1299 chip ($45.80 vs $73.295)
 - We are also planning on using STM32WB5MMG for Microcontroller because of its built-in 2.4 GHz radio for BLE communication
 - I have experience using and programming STM Microcontrollers and it has low power consumption for longer bettery life
+
+<img width="614" height="454" alt="image" src="https://github.com/user-attachments/assets/92c3c146-17d7-47da-9c56-02b9a8631c5a" />
+
+<img width="532" height="553" alt="image" src="https://github.com/user-attachments/assets/ff08328f-fe3d-49fa-824c-8a733a0bc0d9" />
+
+<img width="525" height="373" alt="image" src="https://github.com/user-attachments/assets/018b41d3-6dd6-4523-b03a-b859e92d3ccc" />
+*ADS1299 schematic from datasheet*
+
+<img width="532" height="553" alt="image" src="https://github.com/user-attachments/assets/9f7090de-fe23-4f63-ad51-58b79910eda9" />
+*Tried designing protection circuit for ADS1298 which would have been too complicated for our future board in terms of size and soldering*
+
+
+
+
