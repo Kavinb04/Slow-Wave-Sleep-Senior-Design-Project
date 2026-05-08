@@ -10,3 +10,14 @@
 - We are thinking of using STM32 and are planning on working on submitting the early RFA approval soon
 - Submitted the early RFA approval
 
+# Week 3 (2/2/2026 - 2/8/2026):
+- Our early RFA approval was approved
+- Met again to discuss what we can do further to implement the project
+
+# Week 4 (2/9/2026 - 2/15/2026):
+- We met up to start work on the proposals and came up with our high level requirements 
+- The high level requirement were solidified after meeting with our sponsor
+- I set up meetings with Maggie and we asked her all our questions
+- Our high level requirements are: play pink noise within 300 ms of detecting slow wave sleep, average comfort rating of the headset should be a ⅘, design should be able to support 10 hours of consecutive sleep, 
+- We had our first meeting with our TA Hossein. It was a fruitful discussion and he thinks that this project should be fairly complicated and we should work consistently to get it done
+
