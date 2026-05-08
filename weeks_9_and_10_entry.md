@@ -42,7 +42,7 @@ Round 4 PCB
 <img width="5712" height="4284" alt="IMG_0321" src="https://github.com/user-attachments/assets/4a15bbce-4129-4ce7-b0e9-2f780efddd4f" />
 Finalized PCB
 
-(Insert image of stencil board here)
+<img width="5712" height="4284" alt="IMG_0326" src="https://github.com/user-attachments/assets/da43644d-c681-4697-b4ae-7dc0cff11035" />
 How we applied stencil solder
 
 ## Sine wave plotting
