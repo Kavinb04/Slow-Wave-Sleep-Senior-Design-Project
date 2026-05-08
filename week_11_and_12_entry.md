@@ -15,12 +15,16 @@ Screenshot of EEG reading
 Blink Test
 
 
-## PCB Issues
+## STM32 Replacement
 - STM32 programming capability stopped working
 - Tried many avenues for debugging (Using different computers, previous versions of code, different power
 - Finally had to solder a new STM32
 - Started working (STM was most likely bricked after we messed with firmware updates)
-- firmware updates were needed for bluetooth
+- firmware updates were needed for bluetooth. (accidentally messed with memory that should not be accessed)
+
+## Messed up signal 
+- When trying to incorporate 8 channels into our process, our EEG output was suddenly experiencing lots of noise
+- Could not figure out the source of this noise
 
 ## Bluetooth Capability Issues
 
