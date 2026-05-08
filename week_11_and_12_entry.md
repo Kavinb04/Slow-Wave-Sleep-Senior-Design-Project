@@ -68,5 +68,12 @@ Our board was not salvagable for end to end testing with our software component.
 - Correctly identified slow waves and played pink noise
 <img width="1274" height="717" alt="image" src="https://github.com/user-attachments/assets/0547d75e-6e6f-4331-93fd-1219c9e21b8f" />
 
+### Pink Noise Timing
+- The box represents when the slow wave was detected at its negative peak
+- The straight line is the timestamp when noise was played
+- Within our goa of 300 ms
+<img width="962" height="518" alt="image" src="https://github.com/user-attachments/assets/5d5c9463-75df-408f-b1dc-5204e593851f" />
+
+
 
 
